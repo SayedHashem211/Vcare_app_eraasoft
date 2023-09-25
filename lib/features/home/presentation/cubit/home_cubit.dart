@@ -9,9 +9,11 @@ import 'package:v_care_app/features/home/data/models/get_all_doctors_model.dart'
 
 import '../../../../core/networking/remote/DioHelper.dart';
 import '../../../../core/networking/remote/endpoints.dart';
+import '../../data/models/booking_model.dart';
 import '../../data/models/get_all_appointments_model.dart';
 import '../../data/models/get_home_data_model.dart';
 import '../../data/models/logout_model.dart';
+import '../../data/models/patient_profile_model.dart';
 import '../views/account_tab.dart';
 import '../views/doctors_tab.dart';
 import '../views/history_tab.dart';
@@ -58,7 +60,7 @@ class HomeCubit extends Cubit<HomeState> {
     const DoctorsTab(),
     const SearchTab(),
     const HistoryTab(),
-    const AccountTab()
+    const PatientProfileTab()
   ];
 
   void changeBot(index, context) {
@@ -70,7 +72,11 @@ class HomeCubit extends Cubit<HomeState> {
     if (currentIndex == 0) {
        getHomeData();
     }
+    if (currentIndex == 3) {
+      getAllAppointments();
+    }
     if (currentIndex == 4) {
+      getPatientProfileData();
       getAllAppointments();
     }
   }
@@ -81,11 +87,11 @@ class HomeCubit extends Cubit<HomeState> {
   void getAllDoctors()async{
     emit(GetAllDoctorsLoadingState());
     await DioHelper.getData(url: getAllDoctorsUrl).then((value){
-      print(value.data);
+     // print(value.data);
          getAllDoctorsModel = GetAllDoctorsModel.fromJson(value.data);
          emit(GetAllDoctorsSuccessState());
     }).catchError((error) {
-      print(error.toString());
+      //print(error.toString());
       emit(GetAllDoctorsErrorState());
     });
 
@@ -97,11 +103,11 @@ class HomeCubit extends Cubit<HomeState> {
   void getHomeData()async{
     emit(GetHomeDataLoadingState());
     await DioHelper.getData(url: getHomeDataUrl).then((value){
-      print(value.data);
+      //print(value.data);
       getHomeDataModel = GetHomeDataModel.fromJson(value.data);
       emit(GetHomeDataSuccessState());
     }).catchError((error) {
-      print(error.toString());
+     // print(error.toString());
       emit(GetHomeDataErrorState());
     });
 
@@ -123,13 +129,74 @@ class HomeCubit extends Cubit<HomeState> {
       }
       //print(loginModel?.data?.token);
       //print(loginModel?.data?.id);
-      print(appointmentsData);
+      //print(appointmentsData);
       emit(GetAllAppointmentsSuccessState());
     }).catchError((error) {
-      print(error.toString());
+      //print(error.toString());
       emit(GetAllAppointmentsErrorState());
     });
   }
+
+
+  // book appointment
+
+  List<bool> isChoose = [
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+    false,
+  ];
+
+
+  void changeColor(int index) {
+    emit(ChangeTimeWidgetColorState());
+    for (var i = 0; i < isChoose.length; i++) {
+      i == index ? isChoose[i] = true : isChoose[i] = false;
+    }
+    emit(ChangeTimeWidgetColorState());
+  }
+
+  BookingModel? bookingModel;
+  void bookAppointment({
+    required String doctorId,
+    required String startTime,
+  }) {
+    emit(BookingLoadingState());
+    DioHelper.PostData(url: bookAppointmentUrl, data: {
+      'doctor_id' : doctorId,
+      'start_time': startTime,
+    }).then((value) {
+      bookingModel = BookingModel.fromJson(value.data);
+      //print(loginModel?.token);
+      //print(loginModel?.data?.id);
+      //print(value.data);
+      emit(BookingSuccessState());
+    }).catchError((error) {
+      //print(error.toString());
+      emit(BookingErrorState());
+    });
+  }
+
+
+// 4. get patient profile data
+
+PatientProfileModel? patientProfileModel;
+void getPatientProfileData()async{
+  emit(GetPatientProfileDataLoadingState());
+  await DioHelper.getData(url: getPatientProfileDataUrl).then((value){
+    //print(value.data);
+    patientProfileModel = PatientProfileModel.fromJson(value.data);
+    emit(GetPatientProfileDataSuccessState());
+  }).catchError((error) {
+    //print(error.toString());
+    emit(GetPatientProfileDataErrorState());
+  });
+
+}
+
 
 
 // // 4. get doctor profile data
@@ -147,7 +214,4 @@ class HomeCubit extends Cubit<HomeState> {
   //   });
   //
   // }
-
-
-
 }

@@ -12,12 +12,13 @@ class ProfileTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.black,
-      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 4),
+      margin: EdgeInsets.all(3),
       decoration: ShapeDecoration(
+        color: Colors.white,
         shape: RoundedRectangleBorder(
-          side: const BorderSide(width: 1, color: Colors.black),
-          borderRadius: BorderRadius.circular(5),
+          side: const BorderSide(width: 1, color: Color(0xFF174068)),
+          borderRadius: BorderRadius.circular(10),
         ),
       ),
       child: ListTile(
@@ -26,7 +27,7 @@ class ProfileTile extends StatelessWidget {
           data.appointmentTime??"",
           style: GoogleFonts.roboto(
             color: Colors.grey,
-            fontSize: 10.sp,
+            fontSize: 12.sp,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -34,7 +35,7 @@ class ProfileTile extends StatelessWidget {
           data.status??"",
           style: GoogleFonts.roboto(
             color: Colors.grey,
-            fontSize: 10.sp,
+            fontSize: 12.sp,
             fontWeight: FontWeight.w500,
           ),
         ),

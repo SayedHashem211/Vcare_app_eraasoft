@@ -21,6 +21,16 @@ class GetAllDoctorsLoadingState extends HomeState{}
 class GetAllDoctorsSuccessState extends HomeState{}
 class GetAllDoctorsErrorState extends HomeState{}
 
+
+
+
+// get patient profile data
+class GetPatientProfileDataLoadingState extends HomeState{}
+class GetPatientProfileDataSuccessState extends HomeState{}
+class GetPatientProfileDataErrorState extends HomeState{}
+
+
+
 // get doctor profile data
 class GetDoctorProfileDataLoadingState extends HomeState{}
 class GetDoctorProfileDataSuccessState extends HomeState{}
@@ -40,3 +50,11 @@ class GetHomeDataErrorState extends HomeState{}
 class GetAllAppointmentsLoadingState extends HomeState {}
 class GetAllAppointmentsSuccessState extends HomeState {}
 class GetAllAppointmentsErrorState extends HomeState {}
+
+
+
+// book an appointment
+class ChangeTimeWidgetColorState extends HomeState {}
+class BookingLoadingState extends HomeState {}
+class BookingSuccessState extends HomeState {}
+class BookingErrorState extends HomeState {}

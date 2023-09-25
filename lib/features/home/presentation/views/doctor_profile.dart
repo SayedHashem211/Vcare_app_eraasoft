@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 import 'package:v_care_app/core/utils/custom_button.dart';
+import 'package:v_care_app/features/home/presentation/cubit/home_cubit.dart';
 import 'package:v_care_app/features/home/presentation/views/booking_screen.dart';
 
 class DoctorProfileScreen extends StatefulWidget {
@@ -29,8 +31,20 @@ class DoctorProfileScreen extends StatefulWidget {
 }
 
 class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
+
+  late HomeCubit cubit;
+
+  @override
+  void initState() {
+    super.initState();
+    cubit = HomeCubit.get(context);
+  }
   @override
   Widget build(BuildContext context) {
+    return BlocConsumer<HomeCubit, HomeState>(
+  listener: (context, state) {
+  },
+  builder: (context, state) {
     return Scaffold(
       body: SingleChildScrollView(
         child: SafeArea(
@@ -169,7 +183,9 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
                       text: "BOOK AN APPOINTMENT",
                       onTap: (){
                         Navigator.push(context, MaterialPageRoute(builder: (context){
-                          return const BookingScreen();
+                          return BookingScreen(
+                            doctorId: widget.doctorId,
+                          );
                         }));
                       }
                   ),
@@ -180,5 +196,7 @@ class _DoctorProfileScreenState extends State<DoctorProfileScreen> {
         ),
       ),
     );
+  },
+);
   }
 }

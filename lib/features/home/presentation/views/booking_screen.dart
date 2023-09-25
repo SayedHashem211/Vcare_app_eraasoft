@@ -1,11 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:v_care_app/core/utils/components.dart';
+import 'package:v_care_app/features/home/presentation/cubit/home_cubit.dart';
+import 'package:v_care_app/features/home/presentation/views/widgets/booking_successfully.dart';
+import 'package:v_care_app/features/home/presentation/views/widgets/choose_time_widget.dart';
+
+import '../../../../core/utils/custom_button.dart';
 
 class BookingScreen extends StatefulWidget {
-  const BookingScreen({Key? key}) : super(key: key);
+  const BookingScreen({
+    required this.doctorId,
+    Key? key}) : super(key: key);
+
+  final dynamic doctorId;
 
   @override
   State<BookingScreen> createState() => _BookingScreenState();
@@ -15,6 +25,25 @@ class _BookingScreenState extends State<BookingScreen> {
   final dateController = TextEditingController();
   var formBookingKey = GlobalKey<FormState>();
 
+  String? time;
+  int indexTime = 0;
+  final List<String> availableTimes = [
+    '14:00',
+    '15:00',
+    '16:00',
+    '17:00',
+    '18:00',
+    '19:00',
+    '20:00',
+  ];
+
+  late HomeCubit cubit;
+
+  @override
+  void initState() {
+   cubit = HomeCubit.get(context);
+    super.initState();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,9 +101,76 @@ class _BookingScreenState extends State<BookingScreen> {
                   color: Colors.grey),
             ),
             SizedBox(
-              height: 5.h,
+              height: 10.h,
             ),
-            TimeLabel(),
+            SizedBox(
+              height: 30.h,
+              child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: availableTimes.length,
+                  itemBuilder: (context, index) => InkWell(
+                    onTap: () {
+                      time = availableTimes[index];
+                      indexTime = index;
+                      cubit.changeColor(index);
+                    },
+                    child: ChooseTimeWidget(
+                      time: availableTimes[index],
+                      index: index,
+                    ),
+                  )),
+            ),
+            SizedBox(height: 20.h,),
+            BlocConsumer<HomeCubit, HomeState>(
+              builder: (context, state) {
+                if (state is BookingLoadingState) {
+                  return const Center(
+                    child: CircularProgressIndicator(color: Colors.black),
+                  );
+                } else {
+                  return SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.9,
+                    height: 45.h,
+                    child: CustomButton(
+                      text: 'Book an appointment',
+                      onTap: () async {
+                        print(dateController.text);
+                        print(time);
+                        if (dateController.text == null || time == null) {
+                          const SnackBar(
+                            content: Text('Date And Time Required!'),
+                            duration: Duration(seconds: 1),
+                            showCloseIcon: true,
+                          );
+                        } else {
+                          cubit.bookAppointment(
+                              doctorId: widget.doctorId.toString(),
+                              startTime: "${dateController.text} $time"
+                          );
+                        }
+                      },
+                    ),
+                  );
+                }
+              },
+              listener: (context, state) {
+                if (state is BookingErrorState) {
+                  const SnackBar(
+                    content: Text('Something went wrong!'),
+                    duration: Duration(seconds: 1),
+                    showCloseIcon: true,
+                  );
+                } else if (state is BookingSuccessState) {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) {
+                    return const BookingSuccessfullyScreen();
+                  }));
+                  dateController.clear();
+                  dateController.text = "" ;
+                  time = null;
+                  cubit.isChoose[indexTime] = false;
+                }
+              },
+            )
           ],
         ),
       ),
@@ -82,19 +178,5 @@ class _BookingScreenState extends State<BookingScreen> {
   }
 }
 
-class TimeLabel extends StatelessWidget {
-  const TimeLabel({Key? key}) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 65,
-      height: 35,
-      decoration: BoxDecoration(
-        color: Colors.grey[300],
-        borderRadius: BorderRadius.circular(30),
-      ),
-    );
-  }
-}
 
